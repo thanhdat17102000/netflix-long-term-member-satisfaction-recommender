@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HỆ THỐNG KHUYẾN NGHỊ CHO SỰ HÀI LÒNG CỦA THÀNH VIÊN DÀI HẠN TẠI NETFLIX | Nhóm 9</title>
+<style>
+:root {
+  --bg: #f5f6fa;
+  --surface: #fff;
+  --surface2: #eef1f7;
+  --text: #1c2333;
+  --muted: #5c6578;
+  --line: #d5dbe8;
+  --purple: #53489a;
+  --blue: #2f5d9f;
+  --green: #1f7a4c;
+  --amber: #8a6410;
+  --red: #9b2c2c;
+  --shadow: 0 1px 2px rgba(28, 35, 51, .06), 0 8px 24px rgba(28, 35, 51, .05);
+  --radius: 10px;
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  color: var(--text);
+  background: var(--bg);
+  font: 16px/1.5 "Segoe UI", Inter, ui-sans-serif, system-ui, sans-serif;
+}
+button, input, select { font: inherit; }
+button { cursor: pointer; }
+a { color: var(--blue); }
+.app { max-width: 1280px; margin: 0 auto; padding: 0 20px 72px; }
+.site-header { margin: 0 -20px 12px; padding: 12px 20px 0; }
+.header-row { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; flex-wrap: wrap; }
+.kicker { margin: 0; color: var(--purple); font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.site-header h1 { margin: 2px 0 4px; font-size: clamp(18px, 2.2vw, 24px); line-height: 1.3; letter-spacing: -.02em; max-width: 52rem; }
+.meta { margin: 0; color: var(--muted); font-size: 13px; max-width: 62rem; }
+.header-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sticky-bar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; justify-content: space-between; gap: 12px; align-items: center; flex-wrap: wrap;
+  margin: 12px -20px 0; padding: 8px 20px;
+  background: rgba(245, 246, 250, .96);
+  border-bottom: 1px solid var(--line);
+  backdrop-filter: blur(8px);
+}
+.badge, .chip, .pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 6px 11px; background: var(--surface); font-size: 12px; font-weight: 650;
+}
+.badge.smoke { color: var(--amber); border-color: #e6d3a0; background: #fff8e8; }
+.badge.full { color: var(--green); border-color: #b7e0c8; background: #edf8f1; }
+.chip.artifact { color: var(--green); background: #edf8f1; border-color: #b7e0c8; }
+.chip.smoke { color: var(--amber); background: #fff8e8; border-color: #e6d3a0; }
+.chip.missing { color: var(--muted); background: var(--surface2); }
+.btn {
+  border: 1px solid var(--line); border-radius: 8px;
+  padding: 8px 12px; min-height: 40px; background: var(--surface); color: var(--text);
+}
+.btn:hover, .btn:focus-visible, .control:focus-visible, .search:focus-visible { outline: 2px solid rgba(83, 72, 154, .35); outline-offset: 2px; }
+.nav { display: flex; gap: 4px; overflow-x: auto; min-width: 0; max-width: 100%; margin: 0; padding: 0; }
+.nav a {
+  flex: 0 0 auto; text-decoration: none; color: var(--muted);
+  border-radius: 8px; padding: 8px 12px; font-size: 14px; font-weight: 600;
+}
+.nav a:hover, .nav a.active { color: var(--text); background: var(--surface); }
+.banner {
+  margin: 16px 0 22px; padding: 12px 14px;
+  border: 1px solid #e6d3a0; border-radius: var(--radius);
+  background: #fff8e8; color: #5c4a16; font-size: 14px;
+}
+.banner.full { border-color: #b7e0c8; background: #edf8f1; color: #1f7a4c; }
+.banner.error { border-color: #f0c0c0; background: #fdf2f2; color: var(--red); }
+.section { margin: 0 0 36px; scroll-margin-top: 64px; }
+.section h2 { margin: 0 0 6px; font-size: 22px; letter-spacing: -.02em; }
+.purpose { margin: 0 0 14px; max-width: 75ch; font-weight: 650; }
+.panel, .stat, .stage, .step {
+  background: var(--surface); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.panel { padding: 16px 18px; }
+.panel h3 { margin: 0 0 4px; font-size: 16px; }
+.panel-sub { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+.steps {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: step;
+}
+.step { padding: 14px; min-height: 100%; counter-increment: step; }
+.step::before {
+  content: counter(step);
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 28px; height: 28px; margin-bottom: 8px;
+  border-radius: 999px; background: #f3f1fb; color: var(--purple); font-weight: 800;
+}
+.stats { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.stat { padding: 14px; }
+.stat .label { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.stat strong { display: block; margin-top: 6px; font-size: 22px; letter-spacing: -.03em; }
+.stat small { display: block; margin-top: 4px; color: var(--muted); font-size: 12px; }
+.pipeline { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+.stage { padding: 12px; min-height: 168px; }
+.stage-name { font-size: 14px; font-weight: 800; }
+.stage-design { margin: 6px 0 10px; color: var(--muted); font-size: 12px; min-height: 48px; }
+.stage .chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.grid-2 { display: grid; grid-template-columns: 1.2fr .8fr; gap: 12px; }
+.stack { display: grid; gap: 12px; }
+.quality-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 14px; }
+.rec-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 12px; }
+.chart { display: grid; gap: 10px; }
+.metric-line { display: grid; grid-template-columns: minmax(120px, 180px) 1fr 64px; gap: 8px; align-items: center; font-size: 13px; }
+.bar { height: 10px; border-radius: 999px; background: var(--surface2); overflow: hidden; }
+.bar-fill { height: 100%; border-radius: inherit; background: var(--purple); }
+.bar-fill.als { background: var(--blue); }
+.bar-fill.pop { background: #7a8499; }
+.ok { color: var(--green); }
+.warn { color: var(--amber); }
+.danger { color: var(--red); }
+.table-wrap, .table-scroll { overflow: auto; border: 1px solid var(--line); border-radius: 8px; }
+.table-scroll { max-height: 420px; }
+table { width: 100%; border-collapse: collapse; min-width: 640px; background: var(--surface); }
+table.compact { min-width: 280px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--line); font-size: 14px; vertical-align: top; }
+th { font-size: 12px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); background: var(--surface2); }
+.table-scroll th { position: sticky; top: 0; z-index: 1; }
+tr:last-child td { border-bottom: 0; }
+tr.user-row { cursor: pointer; }
+tr.user-row:hover { background: #f7f8fc; }
+tr.user-row.row-selected { background: #f3f1fb; }
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 12px; }
+.field-label { font-size: 14px; font-weight: 700; }
+.control, .search {
+  border: 1px solid var(--line); border-radius: 8px; min-height: 40px;
+  padding: 8px 10px; background: var(--surface);
+}
+.search { min-width: 180px; }
+.empty, .loading { padding: 22px; color: var(--muted); border: 1px dashed var(--line); border-radius: 8px; background: var(--surface); }
+.toast {
+  position: fixed; right: 16px; bottom: 16px; z-index: 40;
+  padding: 12px 14px; border-radius: 8px; background: #1c2333; color: #fff;
+  opacity: 0; transform: translateY(8px); pointer-events: none; transition: .2s;
+}
+.toast.show { opacity: 1; transform: none; }
+code, .cmd { font-family: ui-monospace, Consolas, monospace; font-size: 12.5px; }
+.cmd-list { margin: 0; padding-left: 18px; }
+.cmd-list li { margin: 6px 0; }
+.note { margin: 10px 0 0; color: var(--muted); font-size: 13px; }
+.meaning { margin-top: 16px; }
+@media (max-width: 1100px) {
+  .pipeline { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .stats, .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .quality-grid, .grid-2, .rec-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 900px) {
+  .pipeline, .quality-grid, .grid-2, .rec-grid, .steps { grid-template-columns: 1fr; }
+  .stats { grid-template-columns: 1fr 1fr; }
+  .stat strong { font-size: 20px; }
+  .section { scroll-margin-top: 96px; }
+}
+@media (max-width: 600px) {
+  .app { padding: 0 14px 56px; }
+  .site-header { margin-right: -14px; margin-left: -14px; padding-right: 14px; padding-left: 14px; }
+  .sticky-bar { margin-right: -14px; margin-left: -14px; padding-right: 14px; padding-left: 14px; }
+  .stats { grid-template-columns: 1fr; }
+  .metric-line { grid-template-columns: minmax(100px, 140px) 1fr 50px; }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="site-header">
+    <div class="header-row">
+      <div>
+        <p class="kicker">Đồ án Công nghệ dữ liệu lớn · IE212.F22.LT.CNTT · Nhóm 9</p>
+        <h1>HỆ THỐNG KHUYẾN NGHỊ CHO SỰ HÀI LÒNG CỦA THÀNH VIÊN DÀI HẠN TẠI NETFLIX</h1>
+        <p class="meta">Dữ liệu và kết quả trên trang được ghi rõ là SMOKE hoặc FULL. MovieLens chỉ dùng để mô phỏng bài toán gợi ý phim trong bối cảnh Netflix.</p>
+      </div>
+    </div>
+    <div class="sticky-bar">
+      <nav class="nav" aria-label="Mục dashboard">
+        <a href="#about">Đang làm gì</a>
+        <a href="#pipeline">Quy trình</a>
+        <a href="#data">Dữ liệu</a>
+        <a href="#models">Mô hình</a>
+        <a href="#explain">Giải thích</a>
+        <a href="#repro">Tái lập</a>
+      </nav>
+      <div class="header-actions">
+        <span class="badge smoke" id="profile-badge">SMOKE</span>
+        <span class="pill" id="generated-at">Ngày tạo dữ liệu: đang tải</span>
+        <button class="btn" id="refresh-btn" type="button">Làm mới</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="banner" id="status-banner">Đang tải dữ liệu.</div>
+
+  <section class="section" id="about">
+    <h2>Bài toán</h2>
+    <p class="purpose">Nhóm dùng lịch sử chấm điểm để gợi ý phim, rồi kiểm tra gợi ý bằng những lượt chấm diễn ra sau đó.</p>
+    <ol class="steps">
+      <li class="step">Đọc dữ liệu phim và lịch sử chấm điểm của người dùng.</li>
+      <li class="step">Chia lịch sử theo thời gian để mô hình chỉ học từ các lượt chấm trước.</li>
+      <li class="step">Tạo danh sách phim bằng ba cách: phổ biến, ALS và kết hợp.</li>
+      <li class="step">Đối chiếu danh sách với các lượt chấm về sau, trong đó từ 4 sao được tính là phản hồi tích cực.</li>
+    </ol>
+  </section>
+
+  <section class="section" id="pipeline">
+    <h2>Quy trình</h2>
+    <p class="purpose">Các bước từ dữ liệu gốc đến danh sách gợi ý và kết quả đánh giá.</p>
+    <div class="pipeline" id="pipeline-stages"></div>
+    <p class="note" id="pipeline-note"></p>
+  </section>
+
+  <section class="section" id="data">
+    <h2>Dữ liệu</h2>
+    <p class="purpose">Số liệu và các bảng bên dưới thuộc đúng bộ dữ liệu đang được hiển thị.</p>
+    <div class="stats" id="data-stats"></div>
+    <div class="quality-grid" id="quality-cards"></div>
+
+    <div class="panel" style="margin-bottom:12px">
+      <h3>Bảng phim</h3>
+      <p class="panel-sub">Tìm phim theo tên hoặc lọc theo thể loại.</p>
+      <div class="controls">
+        <input class="search" id="movie-search" placeholder="Tìm tên phim" aria-label="Tìm tên phim">
+        <label class="field-label" for="genre-filter">Thể loại</label>
+        <select class="control" id="genre-filter" aria-label="Lọc một thể loại"></select>
+      </div>
+      <p class="note" id="movie-count" style="margin-top:0"></p>
+      <div class="table-scroll" id="movie-table-wrap"></div>
+    </div>
+
+    <div class="panel" style="margin-bottom:12px">
+      <h3>Bảng người xem dài hạn</h3>
+      <p class="panel-sub">Chọn một dòng để xem lịch sử và gợi ý của người đó.</p>
+      <div class="table-wrap" id="user-table-wrap"></div>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Cấu trúc tệp dữ liệu</h3>
+        <p class="panel-sub">Các cột cần có trong sáu tệp đầu vào của MovieLens.</p>
+        <div class="table-wrap">
+          <table class="compact">
+            <thead><tr><th>Tệp</th><th>Cột</th></tr></thead>
+            <tbody>
+              <tr><td>ratings.csv</td><td>userId, movieId, rating, timestamp</td></tr>
+              <tr><td>movies.csv</td><td>movieId, title, genres</td></tr>
+              <tr><td>tags.csv</td><td>userId, movieId, tag, timestamp</td></tr>
+              <tr><td>links.csv</td><td>movieId, imdbId, tmdbId</td></tr>
+              <tr><td>genome-scores.csv</td><td>movieId, tagId, relevance</td></tr>
+              <tr><td>genome-tags.csv</td><td>tagId, tag</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Cắt theo thời gian</h3>
+        <p class="panel-sub">Các lượt chấm được chia theo thời gian: phần cũ để học, phần mới để đánh giá.</p>
+        <div id="split-panel"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="models">
+    <h2>So sánh mô hình</h2>
+    <p class="purpose">Ba cách gợi ý được đánh giá trên cùng một tập dữ liệu và cùng một cách tính chỉ số.</p>
+    <div class="panel" style="margin-bottom:12px">
+        <h3>Ba cách tạo gợi ý</h3>
+        <p class="panel-sub">Mỗi cách dùng một nguồn tín hiệu khác nhau để xếp hạng phim.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Cách gợi ý</th><th>Dữ liệu sử dụng</th><th>Cách xếp hạng</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Phim phổ biến</td>
+              <td>Số lượt chấm và điểm trung bình trong tập huấn luyện.</td>
+              <td>Ưu tiên phim phổ biến.</td>
+            </tr>
+            <tr>
+              <td>ALS</td>
+              <td>Mẫu chấm điểm của người dùng và phim.</td>
+              <td>Xếp hạng theo điểm ALS.</td>
+            </tr>
+            <tr>
+              <td>ALS kết hợp</td>
+              <td>Ứng viên ALS cùng đặc trưng phim và lịch sử người dùng.</td>
+              <td>Xếp hạng lại danh sách ứng viên.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Các chỉ số đánh giá</h3>
+        <p class="panel-sub" id="metric-source"></p>
+        <div class="table-wrap"><table id="metrics-table"></table></div>
+        <div class="meaning">
+          <h3>Cách đọc các chỉ số</h3>
+          <p class="panel-sub">Các định nghĩa này áp dụng cho bảng kết quả phía trên.</p>
+          <div class="table-wrap">
+            <table class="compact">
+              <thead><tr><th>Chỉ số</th><th>Cách đọc</th></tr></thead>
+              <tbody>
+                <tr><td>Precision@10</td><td>Trong 10 phim gợi ý, bao nhiêu phim thực sự được chấm từ 4 sao.</td></tr>
+                <tr><td>Recall@10</td><td>Trong số phim được chấm từ 4 sao ở tập kiểm tra, danh sách gợi ý tìm được bao nhiêu.</td></tr>
+                <tr><td>HitRate@10 và SatisfiedHit@10</td><td>10 phim gợi ý có ít nhất một phim từ 4 sao hay không.</td></tr>
+                <tr><td>RMSE</td><td>Độ lệch giữa điểm dự đoán và điểm thực tế; càng thấp càng tốt. Mô hình kết hợp không dự đoán số sao nên không có RMSE.</td></tr>
+                <tr><td>MAP@10, NDCG@10, Catalog coverage</td><td>MAP và NDCG xem phim trúng có nằm gần đầu hay không. Catalog coverage xem gợi ý có trải nhiều phim trong bộ hay không.</td></tr>
+                <tr><td>Mức cải thiện so với phim phổ biến</td><td id="lift-meaning">Đang tải kết quả.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>SatisfiedHit@10</h3>
+        <p class="panel-sub">Tỷ lệ người dùng có ít nhất một phim từ 4 sao trong danh sách gợi ý.</p>
+        <div class="chart" id="metric-chart"></div>
+        <p class="note" id="model-caveat"></p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="explain">
+    <h2>Giải thích</h2>
+    <p class="purpose">Chọn một người dùng để xem lịch sử chấm điểm và danh sách gợi ý của từng mô hình.</p>
+    <div class="controls">
+      <label class="field-label" for="user-search">Tìm mã</label>
+      <input class="search" id="user-search" placeholder="Tìm mã người dùng" aria-label="Tìm mã người dùng">
+      <label class="field-label" for="user-select">Chọn người dùng</label>
+      <select class="control" id="user-select" aria-label="Chọn người dùng"></select>
+    </div>
+    <div class="stats" id="user-profile"></div>
+    <p class="purpose" id="rec-diff">So sánh các phim được đề xuất cho cùng một người dùng.</p>
+    <div class="rec-grid" id="recommendations"></div>
+    <div class="panel">
+      <h3>Lịch sử chấm điểm</h3>
+      <p class="panel-sub">Các lượt chấm điểm có trong bộ dữ liệu đang mở.</p>
+      <p class="note" id="split-note" style="margin-top:0">Train dùng để học mô hình, validation dùng để điều chỉnh, còn test chỉ dùng để đánh giá.</p>
+      <div id="user-history"></div>
+    </div>
+  </section>
+
+  <section class="section" id="repro">
+    <h2>Tái lập</h2>
+    <p class="purpose">Các lệnh chạy dự án và điều kiện để hiển thị kết quả từ bộ dữ liệu đầy đủ.</p>
+    <div class="grid-2">
+      <div class="panel">
+        <h3>Lệnh chạy</h3>
+        <p class="panel-sub">Bạn có thể mở dashboard với dữ liệu mẫu mà không cần cài Spark.</p>
+        <ol class="cmd-list">
+          <li><code>python -m src.web</code> — mở dashboard; khi thiếu kết quả full, trang dùng dữ liệu mẫu.</li>
+          <li><code>python -m pytest -q</code> — chạy test, không cần Spark.</li>
+          <li><code>bash scripts/01_upload_raw.sh --profile smoke</code> … <code>08_evaluate.sh --profile smoke</code></li>
+          <li><code>bash scripts/01_upload_raw.sh --profile full</code> … <code>08_evaluate.sh --profile full</code></li>
+        </ol>
+      </div>
+      <div class="panel">
+        <h3>Muốn chạy bản đầy đủ thì cần gì</h3>
+        <p class="panel-sub">Để có kết quả full, cần chạy pipeline với đủ dữ liệu và phần mềm bên dưới.</p>
+        <ul>
+          <li>Java 17, Python 3.10, PySpark 3.5.1, TensorFlow CPU 2.15.1</li>
+          <li>Hadoop 3.3.6 / HDFS, Spark 3.5.1</li>
+          <li>File dữ liệu lớn giải nén đủ 6 CSV</li>
+        </ul>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:12px">
+      <h3>Khi nào dashboard hiển thị FULL?</h3>
+      <p class="panel-sub">Dashboard chuyển sang FULL khi tìm thấy <code>artifacts/metrics/metrics.json</code> và <code>artifacts/recommendations/top10_recommendations.csv</code> từ lần chạy đầy đủ. Hãy đối chiếu thêm trạng thái pipeline trước khi công bố kết quả.</p>
+      <div id="repro-status"></div>
+    </div>
+  </section>
+  <footer class="note" style="margin-top:32px">Nhóm 9: Nguyễn Hoàng Phước (25210169), Nguyễn Hoàng Tân (25210188), Lê Thị Bích Tuyền (25210236), Nguyễn Lê Thành Đạt (25410029). Giảng viên hướng dẫn: TS. Hà Minh Tân.</footer>
+</div>
+<div class="toast" id="toast" role="status"></div>
+<script>
+const state = { data: null, userId: null, movieQuery: "", movieGenre: "" };
+const CANONICAL_STAGES = [
+  ["RAW", "Lưu các tệp CSV gốc và thông tin kiểm tra tệp."],
+  ["BRONZE", "Chuẩn hóa cột và tách các bản ghi lỗi."],
+  ["SILVER", "Lọc người dùng đủ điều kiện và chia lịch sử theo thời gian."],
+  ["GOLD", "Tạo dữ liệu và đặc trưng để huấn luyện, đánh giá."],
+  ["ALS", "Tạo danh sách phim ứng viên từ lịch sử chấm điểm."],
+  ["XẾP HẠNG LẠI", "Xếp hạng lại các phim ứng viên."],
+  ["ĐÁNH GIÁ", "Đánh giá danh sách bằng các lượt chấm về sau."]
+];
+const METRICS = [
+  ["precision_at_10", "Precision@10"],
+  ["recall_at_10", "Recall@10"],
+  ["map_at_10", "MAP@10"],
+  ["ndcg_at_10", "NDCG@10"],
+  ["hit_rate_at_10", "HitRate@10"],
+  ["satisfied_hit_rate_at_10", "SatisfiedHit@10"],
+  ["catalog_coverage", "Catalog coverage"],
+  ["rmse", "RMSE"]
+];
+const MODEL_ORDER = ["popularity", "als", "hybrid"];
+const $ = function (s) { return document.querySelector(s); };
+const $$ = function (s) { return Array.from(document.querySelectorAll(s)); };
+const esc = function (v) {
+  return String(v == null ? "" : v).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#039;" }[c];
+  });
+};
+const na = function (v) { return v == null || v === "" || Number.isNaN(v) ? "N/A" : v; };
+const num = function (v, d) {
+  d = d === undefined ? 4 : d;
+  return v == null || Number.isNaN(Number(v)) ? "N/A" : Number(v).toFixed(d);
+};
+const pct = function (v) { return v == null || Number.isNaN(Number(v)) ? "N/A" : (Number(v) * 100).toFixed(1) + "%"; };
+const liftText = function (v) {
+  if (v == null || Number.isNaN(Number(v))) return "N/A";
+  if (Number(v) === 0) return "0%";
+  return pct(v);
+};
+const notify = function (message) {
+  const toast = $("#toast");
+  toast.textContent = message;
+  toast.classList.add("show");
+  setTimeout(function () { toast.classList.remove("show"); }, 2400);
+};
+function isFull() { return !!(state.data && state.data.is_full); }
+function modelNames() {
+  return isFull()
+    ? { popularity: "Phim phổ biến", als: "Spark ALS", hybrid: "ALS + MLP" }
+    : { popularity: "Phim phổ biến", als: "ALS cục bộ", hybrid: "ALS + logistic" };
+}
+function users() {
+  return ((state.data && state.data.long_term_users) || []).slice().sort(function (a, b) {
+    return Number(a.userId) - Number(b.userId);
+  });
+}
+function movies() {
+  return ((state.data && state.data.movies) || []).slice().sort(function (a, b) {
+    return Number(a.movieId) - Number(b.movieId);
+  });
+}
+function profileOf(userId) {
+  const map = (state.data && state.data.user_profiles) || {};
+  return map[String(userId)] || users().find(function (u) { return Number(u.userId) === Number(userId); }) || {};
+}
+function recsFor(model) {
+  const by = (state.data && state.data.recommendations_by_model) || {};
+  const rows = by[model] || (model === "hybrid" && state.data && state.data.recommendations) || [];
+  return rows.filter(function (r) { return Number(r.userId) === Number(state.userId); });
+}
+function stamp(iso) {
+  if (!iso) return "N/A";
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? "N/A" : d.toLocaleString("vi-VN", { dateStyle: "medium", timeStyle: "short" });
+}
+function chip(kind, text) { return '<span class="chip ' + kind + '">' + esc(text) + "</span>"; }
+function genresText(row) {
+  const genres = row.genres || [];
+  return genres.length ? genres.join(", ") : "N/A";
+}
+function yearText(row) {
+  const year = Number(row.year);
+  return row.year == null || !year ? "N/A" : String(year);
+}
+async function api(path) {
+  const controller = new AbortController();
+  const timeout = setTimeout(function () { controller.abort(); }, 8000);
+  try {
+    const response = await fetch(path, { signal: controller.signal });
+    const json = await response.json();
+    if (!response.ok) throw new Error(json.message || ("Máy chủ trả về lỗi " + response.status + "."));
+    return json;
+  } catch (e) {
+    if (e.name === "AbortError") throw new Error("Máy chủ phản hồi quá lâu (quá 8 giây)");
+    throw e;
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+function renderStatus() {
+  const full = isFull();
+  const badge = $("#profile-badge");
+  badge.textContent = String(state.data.profile || "smoke").toUpperCase();
+  badge.className = "badge " + (full ? "full" : "smoke");
+  $("#generated-at").textContent = "Ngày tạo dữ liệu: " + stamp(state.data.generated_at);
+  const banner = $("#status-banner");
+  if (full) {
+    banner.className = "banner full";
+    banner.textContent = "Đang hiển thị kết quả từ các tệp đầu ra của quy trình full. " + (state.data.disclaimer || "");
+  } else {
+    banner.className = "banner";
+    banner.textContent = "SMOKE: dữ liệu mẫu được xử lý bằng Python/NumPy trên máy này. Đây không phải kết quả chạy Spark hoặc TensorFlow trên MovieLens 25M.";
+  }
+}
+function stageEvidence(stage) {
+  if (!isFull()) {
+    return {
+      primary: "Dữ liệu mẫu (SMOKE)",
+      primaryKind: "smoke",
+      secondary: "Chưa có kết quả full",
+      secondaryKind: "missing"
+    };
+  }
+  const hasSignal = stage && (stage.path || stage.row_count != null || stage.duration_seconds != null || stage.error);
+  if (!hasSignal) {
+    return {
+      primary: "Thiếu pipeline_status.json",
+      primaryKind: "missing",
+      secondary: "Chưa xác nhận trạng thái",
+      secondaryKind: "missing"
+    };
+  }
+  if (stage.status === "error" || stage.error) {
+    return { primary: "Lỗi tệp kết quả", primaryKind: "missing", secondary: String(stage.error || stage.status), secondaryKind: "missing" };
+  }
+  if (stage.status === "pending" || stage.status === "unknown") {
+    return { primary: "Chưa có kết quả full", primaryKind: "missing", secondary: stage.status === "pending" ? "Đang chờ" : "Chưa rõ trạng thái", secondaryKind: "missing" };
+  }
+  return { primary: "Đã có tệp kết quả", primaryKind: "artifact", secondary: stage.status === "done" ? "Hoàn tất" : (stage.status || "Có dữ liệu đầu ra"), secondaryKind: "artifact" };
+}
+function renderPipeline() {
+  const incoming = (state.data && state.data.pipeline) || [];
+  $("#pipeline-stages").innerHTML = CANONICAL_STAGES.map(function (pair, i) {
+    const stage = incoming[i] || {};
+    const ev = stageEvidence(stage);
+    const count = stage.row_count != null ? '<div class="note">' + Number(stage.row_count).toLocaleString("vi-VN") + " dòng dữ liệu</div>" : "";
+    return '<article class="stage"><div class="kicker">0' + (i + 1) + '</div><div class="stage-name">' + esc(pair[0]) + '</div><div class="stage-design">' + esc(pair[1]) + '</div><div class="chips">' + chip(ev.primaryKind, ev.primary) + chip(ev.secondaryKind, ev.secondary) + "</div>" + count + "</article>";
+  }).join("");
+  $("#pipeline-note").textContent = isFull()
+    ? "Trạng thái từng bước chỉ được xác nhận khi có đường dẫn hoặc số dòng của tệp kết quả."
+    : "Các bước trên mô tả pipeline dự kiến. Kết quả SMOKE hiện do bộ xử lý cục bộ tạo ra.";
+}
+function filteredMovies() {
+  const query = state.movieQuery.trim().toLowerCase();
+  const genre = state.movieGenre;
+  return movies().filter(function (row) {
+    const title = String(row.title || "").toLowerCase();
+    const genres = row.genres || [];
+    if (query && title.indexOf(query) === -1) return false;
+    if (genre && !genres.some(function (item) { return String(item) === genre; })) return false;
+    return true;
+  });
+}
+function renderGenreFilter() {
+  const select = $("#genre-filter");
+  const seen = {};
+  const genres = [];
+  movies().forEach(function (row) {
+    (row.genres || []).forEach(function (genre) {
+      const name = String(genre);
+      if (!seen[name]) {
+        seen[name] = true;
+        genres.push(name);
+      }
+    });
+  });
+  genres.sort();
+  select.innerHTML = '<option value="">Mọi thể loại</option>' + genres.map(function (genre) {
+    return '<option value="' + esc(genre) + '">' + esc(genre) + "</option>";
+  }).join("");
+  select.value = state.movieGenre;
+}
+function renderMovieTable() {
+  const rows = filteredMovies();
+  const total = movies().length;
+  $("#movie-count").textContent = "Đang hiển thị " + rows.length + " trong " + total + " phim.";
+  if (!rows.length) {
+    $("#movie-table-wrap").innerHTML = '<div class="empty">Không tìm thấy phim phù hợp.</div>';
+    return;
+  }
+  $("#movie-table-wrap").innerHTML = '<table id="movie-table"><thead><tr><th>Mã phim</th><th>Tên</th><th>Năm</th><th>Thể loại</th></tr></thead><tbody>' +
+    rows.map(function (row) {
+      return "<tr><td>" + esc(na(row.movieId)) + "</td><td>" + esc(na(row.title)) + "</td><td>" + esc(yearText(row)) + "</td><td>" + esc(genresText(row)) + "</td></tr>";
+    }).join("") + "</tbody></table>";
+}
+function highlightUsers() {
+  $$("#user-table tbody tr").forEach(function (tr) {
+    const on = Number(tr.dataset.userid) === Number(state.userId);
+    tr.classList.toggle("row-selected", on);
+    tr.setAttribute("aria-selected", on ? "true" : "false");
+  });
+}
+function chooseUser(userId) {
+  state.userId = Number(userId);
+  highlightUsers();
+  renderExplain();
+}
+function renderUserTable() {
+  const rows = users();
+  if (!rows.length) {
+    $("#user-table-wrap").innerHTML = '<div class="empty">Bộ dữ liệu này chưa có người dùng đủ điều kiện.</div>';
+    return;
+  }
+  $("#user-table-wrap").innerHTML = '<table id="user-table"><thead><tr><th>Mã người dùng</th><th>Lượt chấm</th><th>Điểm trung bình</th><th>Thời gian hoạt động (ngày)</th><th>Train / validation / test</th></tr></thead><tbody>' +
+    rows.map(function (row) {
+      const split = [na(row.train_rows), na(row.validation_rows), na(row.test_rows)].join(" / ");
+      return '<tr class="user-row" tabindex="0" data-userid="' + esc(row.userId) + '" aria-selected="false"><td>' + esc(row.userId) + "</td><td>" + esc(na(row.rating_count)) + "</td><td>" + esc(na(row.mean_rating)) + "</td><td>" + esc(na(row.activity_span_days)) + "</td><td>" + esc(split) + "</td></tr>";
+    }).join("") + "</tbody></table>";
+  $$("#user-table tbody tr").forEach(function (tr) {
+    tr.addEventListener("click", function () { chooseUser(tr.dataset.userid); });
+    tr.addEventListener("keydown", function (event) {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        chooseUser(tr.dataset.userid);
+      }
+    });
+  });
+  highlightUsers();
+}
+function renderData() {
+  const c = state.data.checks || {};
+  const q = state.data.data_quality || {};
+  const movieCount = movies().length;
+  const ratingRows = [c.train_rows, c.validation_rows, c.test_rows].every(function (v) { return v != null; })
+    ? Number(c.train_rows) + Number(c.validation_rows) + Number(c.test_rows)
+    : null;
+  const cards = [
+    ["Nguồn dữ liệu", isFull() ? "Kết quả full" : "Dữ liệu mẫu", isFull() ? "MovieLens 25M" : "Dữ liệu tạo theo cấu trúc MovieLens"],
+    ["Người dùng đủ điều kiện", na(c.long_term_users), "Theo ngưỡng của cấu hình đang chạy"],
+    ["Lượt chấm đã chia", ratingRows == null ? "N/A" : ratingRows, "Train + validation + test"],
+    ["Số phim", movieCount || "N/A", "Trong bộ dữ liệu đang mở"],
+    ["Trạng thái dữ liệu", q.manifest_status === "FIXTURE" ? "Dữ liệu mẫu" : (q.manifest_status || (isFull() ? "Chưa có" : "Dữ liệu mẫu")), "Theo nguồn kết quả đang mở"]
+  ];
+  $("#data-stats").innerHTML = cards.map(function (x) {
+    return '<article class="stat"><div class="label">' + esc(x[0]) + "</div><strong>" + esc(x[1]) + "</strong><small>" + esc(x[2]) + "</small></article>";
+  }).join("");
+  const quality = [
+    ["Đúng cấu trúc cột", q.schema_status || "N/A", "So với định nghĩa dữ liệu"],
+    ["Giá trị trống", q.null_count == null ? "N/A" : q.null_count, "Số giá trị thiếu"],
+    ["Bản ghi trùng", q.duplicate_count == null ? "N/A" : q.duplicate_count, "Số dòng trùng lặp"],
+    ["Bản ghi bị tách", q.quarantine_rows == null ? "N/A" : q.quarantine_rows, "Các dòng không hợp lệ"],
+    ["Điểm không hợp lệ", q.invalid_rating_count == null ? "N/A" : q.invalid_rating_count, "Ngoài khoảng 0,5–5 sao"],
+    ["Thứ tự thời gian", c.leakage_free == null ? "N/A" : (c.leakage_free ? "PASS" : "FAIL"), "Train trước validation và test"],
+    ["Loại phim đã chấm", q.candidate_exclusion == null ? "N/A" : (q.candidate_exclusion ? "PASS" : "FAIL"), "Không đưa phim trong train vào gợi ý"],
+    ["Phim gợi ý không trùng", c.top10_unique == null ? "N/A" : (c.top10_unique ? "PASS" : "FAIL"), "Mỗi mã phim xuất hiện một lần"]
+  ];
+  $("#quality-cards").innerHTML = quality.map(function (x) {
+    const klass = String(x[1]).includes("FAIL") ? "danger" : (String(x[1]).includes("PASS") ? "ok" : "");
+    const display = x[1] === "PASS" ? "Đạt" : (x[1] === "FAIL" ? "Chưa đạt" : x[1]);
+    return '<article class="stat"><div class="label">' + esc(x[0]) + '</div><strong class="' + klass + '">' + esc(display) + "</strong><small>" + esc(x[2]) + "</small></article>";
+  }).join("");
+  $("#split-panel").innerHTML =
+    "<p><strong>Train / validation / test:</strong> " + esc(na(c.train_rows)) + " / " + esc(na(c.validation_rows)) + " / " + esc(na(c.test_rows)) + " dòng</p>" +
+    "<p>Train diễn ra trước validation và test: <strong class=\"" + (c.leakage_free ? "ok" : "warn") + "\">" + esc(c.leakage_free == null ? "Chưa có" : (c.leakage_free ? "Đạt" : "Chưa đạt")) + "</strong></p>" +
+    "<p class=\"note\">Tỷ lệ chia theo thiết kế là 80/10/10; số dòng lấy từ bộ dữ liệu đang mở.</p>";
+  renderGenreFilter();
+  renderMovieTable();
+  renderUserTable();
+}
+function metricCell(model, key, value) {
+  if (key === "rmse" && model === "hybrid" && (value == null || value === "")) return "không dự đoán số sao";
+  if (key === "rmse") return num(value, 4);
+  return value == null ? "N/A" : num(value, 4);
+}
+function renderLiftMeaning() {
+  const metrics = state.data.metrics || {};
+  const pop = metrics.popularity && metrics.popularity.satisfied_hit_rate_at_10;
+  const als = metrics.als && metrics.als.satisfied_hit_rate_at_10;
+  const hybrid = metrics.hybrid && metrics.hybrid.satisfied_hit_rate_at_10;
+  const comparison = "Kết quả từng cách: phim phổ biến " + num(pop, 4) + ", ALS " + num(als, 4) + ", kết hợp " + num(hybrid, 4) + ".";
+  const text = pop == null || Number(pop) === 0
+    ? "Không tính được mức cải thiện tương đối vì SatisfiedHit@10 của phim phổ biến bằng 0. " + comparison
+    : "Mức cải thiện SatisfiedHit@10 so với phim phổ biến là " + liftText(state.data.satisfaction_lift_vs_popularity) + ". " + comparison;
+  $("#lift-meaning").textContent = text;
+}
+function renderModels() {
+  const metrics = state.data.metrics || {};
+  const names = modelNames();
+  $("#metric-source").textContent = isFull()
+    ? "Nguồn: kết quả pipeline full trên MovieLens 25M."
+    : "Nguồn: dữ liệu mẫu xử lý bằng Python/NumPy. ALS cục bộ và bộ xếp hạng logistic không phải Spark ALS hay TensorFlow MLP.";
+  $("#metrics-table").innerHTML = "<thead><tr><th>Chỉ số</th>" + MODEL_ORDER.map(function (m) { return "<th>" + esc(names[m]) + "</th>"; }).join("") +
+    "</tr></thead><tbody>" + METRICS.map(function (d) {
+      return "<tr><td>" + esc(d[1]) + "</td>" + MODEL_ORDER.map(function (m) {
+        const value = metrics[m] && metrics[m][d[0]];
+        return "<td>" + esc(metricCell(m, d[0], value)) + "</td>";
+      }).join("") + "</tr>";
+    }).join("") + "</tbody>";
+  renderLiftMeaning();
+  $("#metric-chart").innerHTML = MODEL_ORDER.map(function (m, i) {
+    const value = metrics[m] && metrics[m].satisfied_hit_rate_at_10;
+    const width = value == null ? 0 : Math.max(0, Math.min(100, Number(value) * 100));
+    const klass = i === 0 ? "pop" : (i === 1 ? "als" : "");
+    const bar = value == null || Number(value) === 0
+      ? '<div class="bar" title="0"></div>'
+      : '<div class="bar"><div class="bar-fill ' + klass + '" style="width:' + width + '%"></div></div>';
+    return '<div class="metric-line"><span>' + esc(names[m]) + "</span>" + bar + "<strong>" + pct(value) + "</strong></div>";
+  }).join("");
+  const pop = metrics.popularity && metrics.popularity.satisfied_hit_rate_at_10;
+  const usersN = (state.data.checks && state.data.checks.long_term_users) || users().length;
+  const moviesN = movies().length;
+  let caveat = "Bộ dữ liệu đang mở có " + usersN + " người dùng đủ điều kiện và " + moviesN + " phim. ";
+  caveat += pop == null || Number(pop) === 0
+    ? "Không tính mức cải thiện tương đối khi SatisfiedHit@10 của phim phổ biến bằng 0; hãy so sánh trực tiếp ba kết quả."
+    : "Mức cải thiện SatisfiedHit@10 so với phim phổ biến: " + liftText(state.data.satisfaction_lift_vs_popularity) + ".";
+  $("#model-caveat").textContent = caveat;
+}
+function recCard(title, subtitle, columns, rows) {
+  const table = !rows.length
+    ? '<div class="empty">Chưa có phim gợi ý từ cách xếp hạng này.</div>'
+    : '<div class="table-wrap"><table class="compact"><thead><tr>' + columns.map(function (c) { return "<th>" + esc(c[0]) + "</th>"; }).join("") +
+      "</tr></thead><tbody>" + rows.map(function (row) {
+        return "<tr>" + columns.map(function (c) { return "<td>" + c[1](row) + "</td>"; }).join("") + "</tr>";
+      }).join("") + "</tbody></table></div>";
+  return '<article class="panel"><h3>' + esc(title) + '</h3><p class="panel-sub">' + esc(subtitle) + "</p>" + table + "</article>";
+}
+function renderExplain() {
+  const list = users();
+  if (!state.userId && list.length) state.userId = Number(list[0].userId);
+  $("#user-select").innerHTML = list.map(function (u) {
+    return '<option value="' + esc(u.userId) + '">Người dùng ' + esc(u.userId) + "</option>";
+  }).join("") || '<option value="">N/A</option>';
+  if (state.userId) $("#user-select").value = String(state.userId);
+  const p = profileOf(state.userId);
+  const stats = [
+    ["Mã người dùng", state.userId == null ? "N/A" : String(state.userId), "Người đang được chọn"],
+    ["Lượt chấm", na(p.rating_count), "Trong lịch sử dữ liệu"],
+    ["Điểm trung bình", na(p.mean_rating), "Trên thang 5 sao"],
+    ["Thời gian hoạt động", na(p.activity_span_days), "Số ngày giữa lượt đầu và lượt cuối"],
+    ["Train / validation / test", [p.train_rows, p.validation_rows, p.test_rows].map(na).join(" / "), "Số lượt chấm ở mỗi phần"]
+  ];
+  $("#user-profile").innerHTML = stats.map(function (s) {
+    return '<article class="stat"><div class="label">' + esc(s[0]) + "</div><strong>" + esc(s[1]) + "</strong><small>" + esc(s[2]) + "</small></article>";
+  }).join("");
+  const rank = function (row) { return "#" + esc(na(row.rank)); };
+  const title = function (row) { return esc(na(row.title)); };
+  const genre = function (row) { return esc(genresText(row)); };
+  const common = [["Hạng", rank], ["Tên phim", title], ["Thể loại", genre]];
+  $("#recommendations").innerHTML =
+    recCard(modelNames().popularity, "Xếp hạng theo mức độ phổ biến trong tập huấn luyện.", common, recsFor("popularity")) +
+    recCard(modelNames().als, "Dùng điểm ALS để chọn phim ứng viên.", common.concat([["Điểm ALS", function (row) { return esc(num(row.als_score, 4)); }]]), recsFor("als")) +
+    recCard(modelNames().hybrid, isFull() ? "Dùng TensorFlow MLP để xếp hạng lại ứng viên ALS." : "Dùng mô hình logistic cục bộ để xếp hạng lại ứng viên ALS.", common.concat([["Điểm xếp hạng lại", function (row) { return esc(num(row.rerank_score, 4)); }]]), recsFor("hybrid"));
+  const history = p.history;
+  if (!Array.isArray(history) || !history.length) {
+    $("#user-history").innerHTML = '<div class="empty">Chưa có lịch sử chấm điểm của người dùng này.</div>';
+    return;
+  }
+  $("#user-history").innerHTML = '<div class="table-wrap"><table><thead><tr><th>Tập dữ liệu</th><th>Mã phim</th><th>Tên phim</th><th>Điểm</th><th>Thời điểm</th></tr></thead><tbody>' +
+    history.map(function (row) {
+      return "<tr><td>" + esc(na(row.split)) + "</td><td>" + esc(na(row.movieId)) + "</td><td>" + esc(na(row.title)) + "</td><td>" + esc(na(row.rating)) + "</td><td>" + esc(na(row.timestamp)) + "</td></tr>";
+    }).join("") + "</tbody></table></div>";
+}
+function renderRepro() {
+  const missing = [];
+  if (!isFull()) {
+    missing.push("Các chỉ số hiện tại được tính bằng Python/NumPy, không phải Spark hoặc TensorFlow.");
+    missing.push("Dữ liệu mẫu không đại diện cho toàn bộ MovieLens 25M hay người dùng Netflix.");
+  } else {
+    missing.push("Đã tìm thấy metrics.json và top10_recommendations.csv của lần chạy full.");
+    missing.push("Trạng thái từng bước cần được đối chiếu với đường dẫn hoặc số dòng trong pipeline_status.json.");
+  }
+  if (state.data.partial_full_warning) missing.unshift(state.data.partial_full_warning);
+  else if (!isFull()) missing.unshift("Chưa có đủ kết quả full; dashboard đang hiển thị dữ liệu mẫu.");
+  $("#repro-status").innerHTML =
+    "<p><strong>Dữ liệu mẫu:</strong> <code>tests/fixtures/ml-25m</code></p>" +
+    "<p><strong>Kết quả smoke:</strong> <code>artifacts/metrics/web_smoke_metrics.json</code>, <code>artifacts/recommendations/top10_recommendations.csv</code></p>" +
+    "<p><strong>Kết quả full cần có:</strong> <code>artifacts/metrics/metrics.json</code>, <code>metrics.csv</code>, <code>als_rmse.json</code>, <code>artifacts/figures/metric_comparison.png</code></p>" +
+    "<ul>" + missing.map(function (item) { return "<li>" + esc(item) + "</li>"; }).join("") + "</ul>";
+}
+function renderAll() {
+  renderStatus();
+  renderPipeline();
+  renderData();
+  renderModels();
+  renderExplain();
+  renderRepro();
+  highlightUsers();
+}
+async function loadDashboard() {
+  const b = $("#refresh-btn");
+  b.disabled = true;
+  b.textContent = "Đang tải...";
+  try {
+    state.data = await api("/api/dashboard");
+    renderAll();
+  } catch (e) {
+    $("#status-banner").className = "banner error";
+    $("#status-banner").textContent = "Không tải được dashboard: " + e.message;
+    notify(e.message);
+  } finally {
+    b.disabled = false;
+    b.textContent = "Làm mới";
+  }
+}
+$("#refresh-btn").addEventListener("click", loadDashboard);
+$("#user-select").addEventListener("change", function (e) {
+  chooseUser(e.target.value);
+});
+$("#user-search").addEventListener("input", function (e) {
+  const q = e.target.value.trim();
+  const match = users().find(function (u) { return String(u.userId).includes(q); });
+  if (match) chooseUser(match.userId);
+});
+$("#movie-search").addEventListener("input", function (e) {
+  state.movieQuery = e.target.value;
+  renderMovieTable();
+});
+$("#genre-filter").addEventListener("change", function (e) {
+  state.movieGenre = e.target.value;
+  renderMovieTable();
+});
+const navLinks = $$(".nav a");
+const observer = new IntersectionObserver(function (entries) {
+  entries.forEach(function (entry) {
+    if (!entry.isIntersecting) return;
+    navLinks.forEach(function (a) { a.classList.toggle("active", a.getAttribute("href") === "#" + entry.target.id); });
+  });
+}, { rootMargin: "-30% 0px -55% 0px", threshold: 0.05 });
+["about", "pipeline", "data", "models", "explain", "repro"].forEach(function (id) {
+  const node = document.getElementById(id);
+  if (node) observer.observe(node);
+});
+loadDashboard();
+</script>
+</body>
+</html>

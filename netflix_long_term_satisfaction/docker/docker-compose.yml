@@ -1,0 +1,64 @@
+name: ml25m
+
+services:
+  namenode:
+    image: apache/hadoop:3.3.6
+    hostname: namenode
+    container_name: ml25m-namenode
+    command: ["hdfs", "namenode"]
+    ports:
+      - "9870:9870"
+      - "9000:9000"
+    environment:
+      ENSURE_NAMENODE_DIR: "/tmp/hadoop-root/dfs/name"
+    env_file:
+      - ./hadoop.env
+    volumes:
+      - namenode-data:/tmp/hadoop-root/dfs/name
+    networks:
+      - hadoop
+
+  datanode:
+    image: apache/hadoop:3.3.6
+    hostname: datanode
+    container_name: ml25m-datanode
+    command: ["hdfs", "datanode"]
+    depends_on:
+      - namenode
+    env_file:
+      - ./hadoop.env
+    volumes:
+      - datanode-data:/tmp/hadoop-root/dfs/data
+    networks:
+      - hadoop
+
+  pipeline:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.pipeline
+    image: ml25m-pipeline:local
+    hostname: pipeline
+    depends_on:
+      - namenode
+      - datanode
+    working_dir: /workspace
+    mem_limit: 14g
+    volumes:
+      - ..:/workspace
+    environment:
+      PYTHONPATH: /workspace
+      HADOOP_HOME: /opt/hadoop
+      HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
+      JAVA_HOME: /usr/lib/jvm/java-17
+      HOME: /root
+    networks:
+      - hadoop
+    command: ["sleep", "infinity"]
+
+networks:
+  hadoop:
+    driver: bridge
+
+volumes:
+  namenode-data:
+  datanode-data:

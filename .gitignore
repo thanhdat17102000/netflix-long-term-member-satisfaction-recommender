@@ -1,0 +1,31 @@
+# Python và công cụ kiểm thử
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+*.log
+
+# Gói, cache và file kiểm tra bố cục
+node_modules/
+_qa_report_pdf/
+artifacts/docx_qa/
+.codex-finalizer*/
+_ppt_build/
+.pptx_build*/
+
+# Kết quả tạo khi chạy dashboard hoặc pipeline
+netflix_long_term_satisfaction/data/input/
+netflix_long_term_satisfaction/data/extracted/
+netflix_long_term_satisfaction/data/output/
+netflix_long_term_satisfaction/data/warehouse/
+netflix_long_term_satisfaction/artifacts/models/
+netflix_long_term_satisfaction/artifacts/figures/
+netflix_long_term_satisfaction/artifacts/metrics/web_smoke_metrics.json
+netflix_long_term_satisfaction/artifacts/metrics/metrics.json
+netflix_long_term_satisfaction/artifacts/recommendations/top10_recommendations.csv
+netflix_long_term_satisfaction/artifacts/raw_manifest.*
+
+# Thông tin xác thực cục bộ
+.env
+.env.*
+kaggle.json
