@@ -4,7 +4,7 @@
 
 ## File nộp
 
-[Nhom9_Netflix_BanNop.pdf](Nhom9_Netflix_BanNop.pdf) là file nộp duy nhất. Trang 1–5 là báo cáo; trang 6–17 là slide thuyết trình.
+[Nhom9_Netflix_BanNop.pdf](Nhom9_Netflix_BanNop.pdf) là file nộp duy nhất. Trang 1–6 là báo cáo; trang 7–19 là slide thuyết trình.
 
 Bản Word để chỉnh sửa báo cáo: [Nhom9_Netflix_BaoCao.docx](netflix_long_term_satisfaction/reports/Nhom9_Netflix_BaoCao.docx).
 
