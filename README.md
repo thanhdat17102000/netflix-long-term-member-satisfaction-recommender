@@ -2,13 +2,10 @@
 
 Đây là bản nộp đồ án Công nghệ dữ liệu lớn của Nhóm 9. Nhóm dùng dữ liệu MovieLens để thử nghiệm hệ thống khuyến nghị trong đề tài. MovieLens không phải dữ liệu Netflix; các chỉ số về thành viên dài hạn và phản hồi tích cực là cách đo thay thế từ lịch sử chấm điểm.
 
-## File nộp
+## Hai file nộp
 
-[Nhom9_Netflix_BanNop.pdf](Nhom9_Netflix_BanNop.pdf) là file nộp duy nhất. Trang 1–6 là báo cáo; trang 7–19 là slide thuyết trình.
-
-Bản Word để chỉnh sửa báo cáo: [Nhom9_Netflix_BaoCao.docx](netflix_long_term_satisfaction/reports/Nhom9_Netflix_BaoCao.docx).
-
-Bản PowerPoint để chỉnh sửa slide: [Nhom9_Netflix_ThuyetTrinh.pptx](netflix_long_term_satisfaction/presentations/Nhom9_Netflix_ThuyetTrinh.pptx). Slide trong PDF là bản xuất từ PowerPoint này.
+- [Nhom9_Netflix_BaoCao.docx](Nhom9_Netflix_BaoCao.docx): báo cáo Word.
+- [Nhom9_Netflix_ThuyetTrinh.pptx](Nhom9_Netflix_ThuyetTrinh.pptx): slide PowerPoint để thuyết trình.
 
 Mã nguồn và hướng dẫn chạy nằm trong [thư mục dự án](netflix_long_term_satisfaction/README.md).
 

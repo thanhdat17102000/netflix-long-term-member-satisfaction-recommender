@@ -15,7 +15,7 @@ MovieLens 25M là dữ liệu công khai của GroupLens, không phải dữ li�
 
 Giảng viên hướng dẫn: **TS. Hà Minh Tân**.
 
-Bản nộp ở thư mục cha là một file `Nhom9_Netflix_BanNop.pdf`: năm trang báo cáo, tiếp theo là 12 trang slide. Số liệu trong bản nộp lấy từ bản lưu `artifacts/metrics/submission_smoke_metrics.json` lúc 15:24 ngày 29/09/2026 (giờ Việt Nam). File `web_smoke_metrics.json` được tạo lại khi chạy dashboard nên thời điểm tạo của nó có thể khác.
+Bản nộp ở thư mục cha gồm `Nhom9_Netflix_BaoCao.docx` và `Nhom9_Netflix_ThuyetTrinh.pptx`. Số liệu trong hai file lấy từ bản lưu `artifacts/metrics/submission_smoke_metrics.json` lúc 15:24 ngày 29/09/2026 (giờ Việt Nam). File `web_smoke_metrics.json` được tạo lại khi chạy dashboard nên thời điểm tạo của nó có thể khác.
 
 ## 1. Mục tiêu
 
