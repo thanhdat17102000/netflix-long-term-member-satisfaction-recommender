@@ -204,7 +204,7 @@ Cấu hình full cần MovieLens 25M cùng Hadoop HDFS. Trên máy có Docker De
 bash scripts/run_full_docker.sh
 ```
 
-Script này dựng NameNode/DataNode Hadoop 3.3.6, tải `ml-25m` (Kaggle nếu có `kaggle.json`, không thì GroupLens), rồi chạy bước 01–08 trong container. NameNode UI: http://127.0.0.1:9870. Model ALS nằm trên `hdfs://namenode:9000/ml25m/gold/models/als`.
+Script này dựng NameNode/DataNode Hadoop 3.3.6, tải `ml-25m` (Kaggle nếu có `kaggle.json`, không thì GroupLens), rồi chạy bước 01–08 trong container. NameNode UI: http://127.0.0.1:9870. Model ALS nằm trên `hdfs://namenode:9000/ml25m/gold/models/als`. Dữ liệu HDFS nằm trong đĩa của container; tạo lại NameNode sẽ format cụm mới.
 
 Chạy tay trên máy đã có `hdfs` và Spark:
 
@@ -252,7 +252,7 @@ Không chia ngẫu nhiên. Với mỗi `userId`:
 1. Sắp xếp theo `timestamp`, sau đó theo `movieId`.
 2. Dùng các lượt chấm cũ để huấn luyện, phần tiếp theo để điều chỉnh và phần mới nhất để kiểm tra.
 3. Giữ ít nhất một bản ghi ở mỗi phần khi người dùng có từ ba lượt chấm trở lên.
-4. Kiểm tra `max(train_ts) < min(val_ts)` và `max(val_ts) < min(test_ts)`.
+4. Kiểm tra `max(train_ts) <= min(val_ts)` và `max(val_ts) <= min(test_ts)`. Cùng một giây vẫn hợp lệ vì MovieLens ghi nhiều rating trong một timestamp.
 5. Không dùng nhãn của tập test để huấn luyện, chọn đặc trưng, dừng sớm hoặc chọn siêu tham số.
 6. Thống kê độ phổ biến, đặc trưng người dùng/phim và bộ chọn nhãn Genome chỉ được học từ tập train.
 7. Bộ xếp hạng lại dùng validation để học và điều chỉnh; test chỉ dành cho bước đánh giá cuối.

@@ -73,8 +73,8 @@ def main() -> None:
     leaks = leak_check.filter(
         (F.col("val_count") == 0)
         | (F.col("test_count") == 0)
-        | (F.col("max_train_ts") >= F.col("min_val_ts"))
-        | (F.col("max_val_ts") >= F.col("min_test_ts"))
+        | (F.col("max_train_ts") > F.col("min_val_ts"))
+        | (F.col("max_val_ts") > F.col("min_test_ts"))
     )
     leak_count = leaks.limit(1).count()
     if leak_count:

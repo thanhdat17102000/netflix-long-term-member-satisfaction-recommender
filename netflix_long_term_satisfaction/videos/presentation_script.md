@@ -1,33 +1,29 @@
-# Gợi ý lời trình bày cho 12 slide
+# Lời dẫn cho 12 slide
 
-Đề tài: **HỆ THỐNG KHUYẾN NGHỊ CHO SỰ HÀI LÒNG CỦA THÀNH VIÊN DÀI HẠN TẠI NETFLIX**.
+Đề tài: **HỆ THỐNG KHUYẾN NGHỊ CHO SỰ HÀI LÒNG CỦA THÀNH VIÊN DÀI HẠN TẠI NETFLIX**. Giảng viên hướng dẫn: **TS. Hà Minh Tân**. Thời lượng dự kiến: 12–15 phút.
 
-Thời lượng dự kiến: 12–15 phút. Bốn thành viên nói phần được phân công dưới đây và chuyển ý sang người tiếp theo. Giảng viên hướng dẫn: TS. Hà Minh Tân. Khi trình bày số liệu, đọc theo bản báo cáo và dashboard đã chốt cho cùng một lần chạy.
+Slide là phần trình bày hệ thống. Khi thuyết trình, dùng sơ đồ và dashboard để giải thích; không đọc lại chữ trên màn hình. MovieLens là dữ liệu thử nghiệm, không phải dữ liệu thuê bao Netflix.
 
-## Nguyễn Hoàng Phước — 25210169 — slide 1–4, khoảng 3 phút
+## Nguyễn Hoàng Phước — 25210169 — slide 1–4
 
-“Nhóm em thực hiện đề tài hệ thống khuyến nghị cho sự hài lòng của thành viên dài hạn tại Netflix. Nhóm dùng MovieLens 25M công khai để thử nghiệm cách khuyến nghị phim. Vì MovieLens không có thông tin thuê bao hay thời lượng xem, nhóm không thể đo sự hài lòng thật của thành viên Netflix.”
+1. **Mở đầu:** Giới thiệu tên đề tài. Nhóm xây một hệ thống gợi ý phim và dùng MovieLens để thử quy trình.
+2. **Đầu ra:** Lịch sử chấm điểm tạo danh sách ứng viên, mô hình xếp hạng để chọn Top 10. Các lượt chấm diễn ra sau được dùng để đánh giá.
+3. **Kiến trúc:** Chỉ lần lượt năm phần trên sơ đồ: đầu vào, xử lý, tạo ứng viên, xếp hạng và dashboard/API.
+4. **Dữ liệu:** `ratings.csv` ghi người dùng chấm phim nào, bao nhiêu sao, vào lúc nào; `movies.csv` có tên và thể loại. MovieLens không có thông tin thuê bao hay mức hài lòng thật của Netflix.
 
-“Trong cấu hình đầy đủ, nhóm chọn người có ít nhất 20 lượt chấm trải dài 180 ngày. Khi đánh giá gợi ý, một lượt chấm từ 4 sao được xem là phản hồi tích cực. Đây là hai quy ước để thực nghiệm trên dữ liệu hiện có, không phải định nghĩa về khách hàng dài hạn hay mức hài lòng của Netflix.”
+## Nguyễn Hoàng Tân — 25210188 — slide 5–6
 
-## Nguyễn Hoàng Tân — 25210188 — slide 5–6, khoảng 3 phút
+5. **Chọn người dùng và chia thời gian:** Bản full chọn người có ít nhất 20 lượt chấm trong 180 ngày; smoke dùng ngưỡng 5 lượt trong 30 ngày. Train đứng trước validation và test. Đặc trưng chỉ tính từ train.
+6. **Pipeline dữ liệu:** RAW giữ tệp gốc; BRONZE kiểm tra bản ghi; SILVER lọc người dùng và chia lịch sử; GOLD tạo đặc trưng. HDFS và Spark thuộc cấu hình full.
 
-“MovieLens 25M gồm sáu tệp đầu vào. Nhóm giữ bản gốc ở tầng RAW, chuẩn hóa dữ liệu tại BRONZE, tạo các bảng và chia lịch sử theo thời gian ở SILVER, rồi chuẩn bị đặc trưng cho mô hình tại GOLD. Khi chạy cấu hình full, HDFS dùng để lưu dữ liệu và Spark xử lý các bảng lớn.”
+## Lê Thị Bích Tuyền — 25210236 — slide 7–9
 
-“Nhóm chia lượt chấm theo thời gian để phần dùng đánh giá xảy ra sau phần huấn luyện. Các thống kê về phim và người dùng được tính từ dữ liệu huấn luyện, tránh đưa thông tin của tập kiểm tra vào mô hình.”
+7. **Mô hình:** Phim phổ biến là mốc so sánh. ALS học mẫu chấm điểm để tạo ứng viên. Nhánh kết hợp xếp lại các ứng viên đó bằng đặc trưng.
+8. **Phạm vi chạy:** Full được thiết kế với MovieLens 25M, HDFS, Spark ALS và TensorFlow MLP. Bản nộp hiện có kết quả smoke cục bộ bằng Python/NumPy ALS và bộ xếp hạng lại logistic.
+9. **Kết quả smoke:** Bản lưu 15:24 ngày 29/09/2026 có 24 người dùng đủ điều kiện. Precision@10 và NDCG@10 của ALS cục bộ lần lượt là 9,17% và 18,89%; nhánh kết hợp là 5,83% và 14,21%. Chỉ số trên dữ liệu mẫu chưa chứng minh hiệu quả của bản full.
 
-## Lê Thị Bích Tuyền — 25210236 — slide 7–9, khoảng 4 phút
+## Nguyễn Lê Thành Đạt — 25410029 — slide 10–12
 
-“Nhóm so sánh ba cách gợi ý: chọn phim phổ biến, Spark ALS và ALS kết hợp bộ xếp hạng lại TensorFlow MLP. ALS tạo danh sách ứng viên từ lịch sử chấm điểm. MLP dùng thêm đặc trưng về phim và người dùng để sắp xếp danh sách đó.”
-
-“Các chỉ số như Precision@10, NDCG@10 và SatisfiedHitRate@10 đánh giá danh sách trên các lượt chấm về sau. RMSE chỉ dùng cho mô hình dự đoán số sao; bộ xếp hạng lại không có chỉ số này.”
-
-“Dashboard giúp xem dữ liệu, trạng thái xử lý, kết quả của từng mô hình và gợi ý cho một người dùng cụ thể. Ở chế độ SMOKE, dashboard dùng bộ dữ liệu mẫu và mô hình Python/NumPy cục bộ. Bộ xếp hạng lại trong bản này là logistic, không phải TensorFlow MLP.”
-
-“Slide số liệu lấy từ bản lưu `submission_smoke_metrics.json` tạo lúc 15:24 ngày 29/09/2026. Có 24 người dùng đủ điều kiện. Những số này cho thấy chương trình chạy trên dữ liệu mẫu; chúng không đại diện cho kết quả MovieLens 25M.”
-
-## Nguyễn Lê Thành Đạt — 25410029 — slide 10–12, khoảng 3–4 phút
-
-“Khi demo, nhóm mở dashboard và chỉ vào nhãn SMOKE hoặc FULL trước khi đọc số. Có thể chọn một người dùng để so sánh ba danh sách gợi ý và xem các lượt chấm nằm ở train, validation hay test.”
-
-“Hiện dự án có mã nguồn, cấu hình, dữ liệu mẫu và kết quả smoke. Để báo cáo kết quả full, nhóm còn phải chuẩn bị MovieLens 25M, môi trường Hadoop/Spark/TensorFlow, chạy toàn bộ pipeline và lưu đầu ra của lần chạy. Vì vậy, phần kết luận chỉ nói về những gì đã được kiểm chứng. Em xin cảm ơn thầy và các bạn.”
+10. **Dashboard:** Ảnh chụp ở chế độ SMOKE cho thấy một người dùng và ba danh sách gợi ý. Khi demo trực tiếp, kiểm tra nhãn SMOKE/FULL trước khi đọc số.
+11. **Phần đã kiểm chứng:** Bộ kiểm thử có 21 bài đạt; bản lưu smoke có 24 người dùng. Nhóm cần chạy MovieLens 25M trên môi trường full trước khi kết luận về Spark ALS hoặc TensorFlow MLP.
+12. **Kết thúc:** Tóm lại hệ thống có luồng dữ liệu, mô hình thử và dashboard. Cảm ơn thầy và các bạn, mời câu hỏi.

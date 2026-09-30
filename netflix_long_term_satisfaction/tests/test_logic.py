@@ -51,6 +51,7 @@ def test_temporal_split_keeps_three_parts_for_small_users():
 
 def test_temporal_leakage_detection():
     assert temporal_order_is_valid([1, 2], [3], [4])
+    assert temporal_order_is_valid([1, 2], [2], [4])
     assert not temporal_order_is_valid([1, 5], [3], [4])
     assert not temporal_order_is_valid([1], [2, 5], [4])
 

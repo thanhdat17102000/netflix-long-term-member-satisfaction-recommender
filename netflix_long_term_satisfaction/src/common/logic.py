@@ -74,7 +74,8 @@ def temporal_order_is_valid(
     test = list(test_timestamps)
     if not train or not validation or not test:
         return False
-    return max(train) < min(validation) and max(validation) < min(test)
+    # Equal timestamps are allowed: MovieLens users often rate several movies in the same second.
+    return max(train) <= min(validation) and max(validation) <= min(test)
 
 
 def exclude_train_items(candidates: Iterable[int], train_items: Iterable[int]) -> list[int]:

@@ -1,7 +1,8 @@
+FROM apache/hadoop:3.3.6 AS hadoop
+
 FROM python:3.10-slim-bookworm
 
 ENV DEBIAN_FRONTEND=noninteractive \
-    HADOOP_VERSION=3.3.6 \
     HADOOP_HOME=/opt/hadoop \
     HADOOP_CONF_DIR=/opt/hadoop/etc/hadoop \
     JAVA_HOME=/usr/lib/jvm/java-17 \
@@ -20,13 +21,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && arch="$(dpkg --print-architecture)" \
     && ln -sfn "/usr/lib/jvm/java-17-openjdk-${arch}" /usr/lib/jvm/java-17
 
-RUN curl -fL --retry 3 --retry-delay 2 \
-      "https://archive.apache.org/dist/hadoop/common/hadoop-${HADOOP_VERSION}/hadoop-${HADOOP_VERSION}.tar.gz" \
-      -o /tmp/hadoop.tar.gz \
-    && tar -xzf /tmp/hadoop.tar.gz -C /opt \
-    && mv "/opt/hadoop-${HADOOP_VERSION}" "${HADOOP_HOME}" \
-    && rm /tmp/hadoop.tar.gz
-
+COPY --from=hadoop /opt/hadoop /opt/hadoop
 COPY docker/core-site.xml docker/hdfs-site.xml ${HADOOP_CONF_DIR}/
 
 COPY requirements.txt /tmp/requirements.txt

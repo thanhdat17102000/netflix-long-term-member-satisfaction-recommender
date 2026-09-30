@@ -8,6 +8,8 @@
 
 Bản Word để chỉnh sửa báo cáo: [Nhom9_Netflix_BaoCao.docx](netflix_long_term_satisfaction/reports/Nhom9_Netflix_BaoCao.docx).
 
+Bản PowerPoint để chỉnh sửa slide: [Nhom9_Netflix_ThuyetTrinh.pptx](netflix_long_term_satisfaction/presentations/Nhom9_Netflix_ThuyetTrinh.pptx). Slide trong PDF là bản xuất từ PowerPoint này.
+
 Mã nguồn và hướng dẫn chạy nằm trong [thư mục dự án](netflix_long_term_satisfaction/README.md).
 
 ## Nhóm thực hiện

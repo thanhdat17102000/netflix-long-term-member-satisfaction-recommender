@@ -11,10 +11,9 @@ services:
       - "9000:9000"
     environment:
       ENSURE_NAMENODE_DIR: "/tmp/hadoop-root/dfs/name"
+      HADOOP_NAMENODE_OPTS: "-Xmx1536m"
     env_file:
       - ./hadoop.env
-    volumes:
-      - namenode-data:/tmp/hadoop-root/dfs/name
     networks:
       - hadoop
 
@@ -25,10 +24,10 @@ services:
     command: ["hdfs", "datanode"]
     depends_on:
       - namenode
+    environment:
+      HADOOP_DATANODE_OPTS: "-Xmx1024m"
     env_file:
       - ./hadoop.env
-    volumes:
-      - datanode-data:/tmp/hadoop-root/dfs/data
     networks:
       - hadoop
 
@@ -51,6 +50,7 @@ services:
       HADOOP_CONF_DIR: /opt/hadoop/etc/hadoop
       JAVA_HOME: /usr/lib/jvm/java-17
       HOME: /root
+      PATH: /opt/hadoop/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
     networks:
       - hadoop
     command: ["sleep", "infinity"]
@@ -58,7 +58,3 @@ services:
 networks:
   hadoop:
     driver: bridge
-
-volumes:
-  namenode-data:
-  datanode-data:

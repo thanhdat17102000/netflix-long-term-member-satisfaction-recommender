@@ -11,8 +11,22 @@ _ROOT = Path(__file__).resolve().parents[2]
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
+from pyspark.sql import types as T
+
 from src.common.config import REQUIRED_RAW_FILES, artifacts_dir, lake_path, load_config
 from src.common.spark import create_spark
+
+MANIFEST_SCHEMA = T.StructType(
+    [
+        T.StructField("filename", T.StringType(), False),
+        T.StructField("bytes", T.LongType(), True),
+        T.StructField("sha256", T.StringType(), True),
+        T.StructField("row_count", T.LongType(), True),
+        T.StructField("header", T.StringType(), True),
+        T.StructField("checked_at", T.StringType(), True),
+        T.StructField("path", T.StringType(), True),
+    ]
+)
 
 
 def _sha256_and_bytes(path: Path) -> tuple[str, int]:
@@ -80,7 +94,7 @@ def main() -> None:
 
     spark = create_spark("MovieLens-Raw-Manifest-Write", config)
     try:
-        manifest = spark.createDataFrame(rows)
+        manifest = spark.createDataFrame(rows, schema=MANIFEST_SCHEMA)
         manifest.write.mode("overwrite").json(lake_path(config, "raw", "manifest"))
     finally:
         spark.stop()
