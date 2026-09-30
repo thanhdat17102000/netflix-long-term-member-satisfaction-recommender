@@ -6,8 +6,8 @@ Chỉ vào sơ đồ, biểu đồ và dashboard khi nói. MovieLens là dữ li
 
 ## Nguyễn Hoàng Phước — 25210169 — slide 1–5
 
-1. **Nhóm:** Giới thiệu học phần, giảng viên và bốn thành viên.
-2. **Đề tài:** Nhóm xây hệ thống gợi ý phim cho bài toán thành viên dài hạn. MovieLens 25M cung cấp dữ liệu để thử quy trình.
+1. **Mở đầu:** Giới thiệu đúng tên đề tài, học phần, giảng viên và bốn thành viên.
+2. **Mục tiêu:** Hệ thống chọn phim chưa chấm, xếp hạng theo người dùng và đánh giá bằng lượt chấm về sau. MovieLens 25M là dữ liệu thử nghiệm.
 3. **Luồng hệ thống:** Đi theo năm phần trên slide: dữ liệu, xử lý, ứng viên, xếp hạng, hiển thị.
 4. **Đầu ra:** Lượt chấm trước tạo danh sách gợi ý Top 10. Lượt chấm xảy ra sau dùng để đánh giá danh sách.
 5. **Dữ liệu:** `ratings.csv` ghi người dùng chấm phim nào, bao nhiêu sao và lúc nào; `movies.csv` có tên và thể loại. MovieLens không có thông tin thuê bao hay mức hài lòng thật của Netflix.
